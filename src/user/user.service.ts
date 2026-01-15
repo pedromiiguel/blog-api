@@ -1,10 +1,17 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashingService } from 'src/common/hashing/hashing.service';
+import { UpdatePasswordUserDto } from './dto/update-password-user.dto';
 
 @Injectable()
 export class UserService {
@@ -13,14 +20,28 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     private readonly hashingService: HashingService,
   ) {}
-  async create(createUserDto: CreateUserDto) {
-    const userAlreadyExists = await this.userRepository.exists({
-      where: { email: createUserDto.email },
+
+  async findByOrFail(userData: Partial<User>) {
+    const user = await this.userRepository.findOneBy(userData);
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado.');
+    }
+    return user;
+  }
+
+  async findOneByEmailOrFail(email: string) {
+    const emailExists = await this.userRepository.existsBy({
+      email,
     });
 
-    if (userAlreadyExists) {
+    if (emailExists) {
       throw new ConflictException('Usuário com esse e-mail já cadastrado.');
     }
+  }
+
+  async create(createUserDto: CreateUserDto) {
+    await this.findOneByEmailOrFail(createUserDto.email);
 
     const hashedPassword = await this.hashingService.hash(
       createUserDto.password,
@@ -54,15 +75,66 @@ export class UserService {
     return `This action returns all user`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(userId: string) {
+    const user = await this.findByOrFail({ id: userId });
+    return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(userId: string, updateUserDto: UpdateUserDto) {
+    if (!updateUserDto?.email && !updateUserDto?.email) {
+      throw new BadRequestException('Dados não enviados.');
+    }
+
+    const user = await this.findByOrFail({ id: userId });
+
+    user.name = updateUserDto.name ?? user.name;
+
+    if (updateUserDto.email && updateUserDto.email !== user.email) {
+      await this.findOneByEmailOrFail(updateUserDto.email);
+      user.email = updateUserDto.email;
+      user.forceLogout = true;
+    }
+
+    return this.save(user);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async updatePassword(
+    userId: string,
+    updatePasswordUserDto: UpdatePasswordUserDto,
+  ) {
+    const user = await this.findByOrFail({ id: userId });
+
+    const isCurrentPasswordValid = await this.hashingService.compare(
+      updatePasswordUserDto.currentPassword,
+      user.password,
+    );
+
+    if (!isCurrentPasswordValid) {
+      throw new UnauthorizedException('Senha atual incorreta.');
+    }
+
+    if (
+      updatePasswordUserDto.currentPassword ===
+      updatePasswordUserDto.newPassword
+    ) {
+      throw new BadRequestException(
+        'A nova senha deve ser diferente da senha atual.',
+      );
+    }
+
+    const hashedNewPassword = await this.hashingService.hash(
+      updatePasswordUserDto.newPassword,
+    );
+
+    user.password = hashedNewPassword;
+    user.forceLogout = true;
+
+    return this.save(user);
+  }
+
+  async remove(userId: string) {
+    const user = await this.findByOrFail({ id: userId });
+    await this.userRepository.delete({ id: userId });
+    return user;
   }
 }
