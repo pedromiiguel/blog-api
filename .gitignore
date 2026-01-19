@@ -2,7 +2,8 @@
 /dist
 /node_modules
 /build
-
+uploads/
+db.sqlite
 # Logs
 logs
 *.log
