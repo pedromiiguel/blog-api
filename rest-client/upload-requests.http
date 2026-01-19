@@ -1,0 +1,36 @@
+@baseUrl = http://localhost:3000
+@jwtToken = {{authLogin.response.body.accessToken}}
+@userNameForTesting = Pedro
+@userEmailForTesting = luiz@email.com
+@userPasswordForTesting = 123456
+@userNewPasswordForTesting = 123456
+
+@imagePath = {{uploadImage.response.body.url}}
+@imageUrl = {{baseUrl}}{{imagePath}}
+
+# Auth login
+# @name authLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+   "email": "{{userEmailForTesting}}",
+  "password": "{{userPasswordForTesting}}"
+}
+
+### Upload Image
+# @name uploadImage
+POST {{baseUrl}}/upload
+Authorization: Bearer {{jwtToken}}
+Content-Type: multipart/form-data; boundary=----BryenFormBoundary
+
+------BryenFormBoundary
+Content-Disposition: form-data; name="file"; filename="image.jpeg"
+Content-Type: image/jpeg
+
+< ../dev/images/image.jpeg
+------BryenFormBoundary--
+
+### Read Image
+# @name readImage
+GET {{imageUrl}}
