@@ -1,98 +1,127 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Blog API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API REST para gerenciamento de blog construída com NestJS, TypeScript e TypeORM. Oferece funcionalidades completas de autenticação, gerenciamento de usuários, posts e upload de imagens.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🚀 Funcionalidades
 
-## Description
+- **Autenticação JWT**: Sistema completo de autenticação com tokens JWT
+- **Gerenciamento de Usuários**: CRUD completo de usuários com hash de senhas usando bcrypt
+- **Gerenciamento de Posts**: Criação, edição, listagem e exclusão de posts
+- **Sistema de Slug**: Geração automática de slugs únicos para posts
+- **Upload de Imagens**: Upload e servir imagens com validação de tipo
+- **Posts Públicos/Privados**: Controle de visibilidade de posts (publicado/rascunho)
+- **Proteção de Rotas**: Guards JWT para rotas protegidas
+- **Rate Limiting**: Throttling para proteção contra abuso de API
+- **Segurança**: Helmet, CORS configurável e validação de dados
+- **Banco de Dados**: SQLite com TypeORM
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🛠️ Tecnologias
 
-## Project setup
+- **Framework**: NestJS 11.x
+- **Linguagem**: TypeScript
+- **ORM**: TypeORM
+- **Banco de Dados**: SQLite (better-sqlite3)
+- **Autenticação**: Passport + JWT
+- **Validação**: class-validator + class-transformer
+- **Segurança**: Helmet, bcryptjs
+- **Upload**: Multer (integrado ao NestJS)
 
+## 📋 Pré-requisitos
+
+- Node.js (versão 18 ou superior)
+- npm ou yarn
+
+## ⚙️ Instalação
+
+1. Clone o repositório:
 ```bash
-$ npm install
+git clone <url-do-repositorio>
+cd blog-api
 ```
 
-## Compile and run the project
-
+2. Instale as dependências:
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+3. Configure as variáveis de ambiente:
+Crie um arquivo `.env` na raiz do projeto:
+```env
+PORT=3000
+JWT_SECRET=sua_chave_secreta_jwt
+JWT_EXPIRATION_TIME=1d
+CORS_WHITELIST=http://localhost:3000,http://localhost:4200
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## 🚀 Executando a aplicação
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Modo desenvolvimento
+npm run start:dev
+
+# Modo produção
+npm run build
+npm run start:prod
+
+# Modo debug
+npm run start:debug
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+A API estará disponível em `http://localhost:3000`
 
-## Resources
+## 📚 Estrutura do Projeto
 
-Check out a few resources that may come in handy when working with NestJS:
+```
+src/
+├── auth/               # Módulo de autenticação
+│   ├── guards/        # JWT Guards
+│   ├── dto/           # DTOs de autenticação
+│   └── types/         # Tipos TypeScript
+├── user/              # Módulo de usuários
+│   ├── dto/           # DTOs de usuário
+│   └── entities/      # Entidade User
+├── post/              # Módulo de posts
+│   ├── dto/           # DTOs de post
+│   └── entities/      # Entidade Post
+├── upload/            # Módulo de upload
+├── common/            # Módulos compartilhados
+│   ├── filters/       # Exception filters
+│   ├── hashing/       # Serviços de hash
+│   ├── pipes/         # Pipes customizados
+│   └── utils/         # Utilitários
+└── main.ts            # Entry point
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## 🔑 Endpoints Principais
 
-## Support
+### Autenticação
+- `POST /auth/login` - Login de usuário
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Usuários
+- `POST /user` - Criar novo usuário
+- `GET /user/me` - Obter usuário autenticado (protegido)
+- `PATCH /user/me` - Atualizar usuário autenticado (protegido)
+- `PATCH /user/me/password` - Alterar senha (protegido)
+- `DELETE /user/me` - Deletar conta (protegido)
 
-## Stay in touch
+### Posts
+- `GET /post` - Listar posts públicos
+- `GET /post/:slug` - Obter post público por slug
+- `POST /post/me` - Criar post (protegido)
+- `GET /post/me` - Listar posts do usuário (protegido)
+- `GET /post/me/:id` - Obter post do usuário por ID (protegido)
+- `PATCH /post/me/:id` - Atualizar post (protegido)
+- `DELETE /post/me/:id` - Deletar post (protegido)
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Upload
+- `POST /upload/image` - Upload de imagem (protegido)
+- `GET /uploads/*` - Servir arquivos estáticos
 
-## License
+## 📝 Scripts REST Client
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+O projeto inclui arquivos `.http` na pasta `rest-client/` para testar os endpoints:
+- `user-requests.http` - Requisições de usuários
+- `post-requests.http` - Requisições de posts
+- `upload-requests.http` - Requisições de upload
+
+Use a extensão REST Client do VS Code para executá-los.
